@@ -4,6 +4,7 @@ const cors = require('cors')
 const fetch = require("node-fetch");
 const DiscoveryV1 = require('ibm-watson/discovery/v1');
 const { IamAuthenticator } = require('ibm-watson/auth');
+const mysql = require('mysql');
 
 require('dotenv').config()
 
@@ -66,7 +67,7 @@ app.post('/api/v1', async (req, res) => {
             'naturalLanguageQuery': req.body.job,
             'passages': true,
             'passagesCount': 3,
-          };
+        };
 
         try {
             data = await discovery.query(queryParams);
@@ -90,6 +91,30 @@ app.post('/api/v1', async (req, res) => {
         } catch (err) {
             res.json({error: "it failed : " + err });
         }
+    }
+    else if (req.body.type == 'contact') {
+        // save this email to contact page
+
+        var con = mysql.createConnection({
+            host: "localhost",
+            user: "newuser",
+            password: "newpassword", 
+            database: 'userLogin'
+        });
+
+        con.connect(function(err) {
+            if (err) throw err;
+            console.log("Connected!");
+            res.json({'success': true});
+        });
+
+        var query = `INSERT INTO emails (address) VALUES ('${req.body.email}')`
+    
+        con.query(query, function (err, result) {
+            if (err) throw err;
+            console.log("1 record inserted");
+        });
+    
     }
     else {
         res.json({'success': false});
