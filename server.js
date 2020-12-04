@@ -54,7 +54,7 @@ app.post('/api/v1', async (req, res) => {
             let skills = data._links.hasEssentialSkill.map((v) => {
                 return `${v.title}`;
             });
-            res.json({ result: `Skills of a ${params.skill} include: ` + skills.join(", ") });
+            res.json({ result: `Skills of a ${req.body.skill} include: ` + skills.join(", ") });
         }
 
     }
