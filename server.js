@@ -2,6 +2,8 @@ const express = require('express')
 const helmet = require('helmet')
 const cors = require('cors')
 const fetch = require("node-fetch");
+const DiscoveryV1 = require('ibm-watson/discovery/v1');
+const { IamAuthenticator } = require('ibm-watson/auth');
 
 require('dotenv').config()
 
@@ -11,11 +13,6 @@ app.use(helmet());
 app.use(express.json());
 
 app.get('/test', (req, res) => res.status(200).send('ok'));
-
-//const esco = require('./routes/esco')
-//app.use('/api/v1/esco', esco)
-
-//app.get('/api/v1', (req, res) => res.json({'success': true}));
 
 app.post('/api/v1', async (req, res) => {
     console.log(req.body)
@@ -37,8 +34,6 @@ app.post('/api/v1', async (req, res) => {
         }
         else if (!req.body.skill)//search for career? 
         {
-           // myURL = "https://ec.europa.eu/esco/api/search?language=en&text="
-        //    myURL = myURL + params.job;
             res.json({ result: 'We do not have information for that career field yet.' });
         }
 
@@ -46,7 +41,6 @@ app.post('/api/v1', async (req, res) => {
         let data = await response.json();
         if (!req.body.skill)
         {
-            //console.log(data)
             res.json({result: data.description.en.literal});
         }
         else
@@ -54,12 +48,48 @@ app.post('/api/v1', async (req, res) => {
             let skills = data._links.hasEssentialSkill.map((v) => {
                 return `${v.title}`;
             });
-            res.json({ result: `Skills of a ${req.body.skill} include: ` + skills.join(", ") });
+            res.json({ result: `${req.body.skill}'s ` + skills.join(", ") });
         }
-
     }
     else if (req.body.type == 'discovery') {
-        res.json({'success': true});
+        const discovery = new DiscoveryV1({
+            version: '2019-04-30',
+            authenticator: new IamAuthenticator({
+                apikey: 'pTWrqgHEIYgMZNi5Wbn0G6Cqa3rQ0eE5KaFLTwbNv--C',
+            }),
+            serviceUrl: 'https://api.us-east.discovery.watson.cloud.ibm.com/instances/ffd0ed75-874f-4502-a65d-613228f0a71a',
+        });
+        
+        const queryParams = {
+            'environmentId': '5d9c5d49-b689-49ef-9a37-05343b4c44ff',
+            'collectionId': '4251e13c-9d02-40f6-9d41-9a21d6ca7148',
+            'naturalLanguageQuery': req.body.job,
+            'passages': true,
+            'passagesCount': 3,
+          };
+
+        try {
+            data = await discovery.query(queryParams);
+            
+            var ids = [];
+            
+            // for(var i = 0; i < data.passages.length; i++) {
+            //    var obj = data.passages.document_id[i];
+            //    ids.push(obj)
+            //}
+            let response = data.result.passages.map((v, i) => {
+                return `${v.document_id}
+                        ${v.passage_text}`;
+                        // ${v.url}`;
+                });
+            res.json( {
+                result: 
+                `Here are some ${req.body.job}'s we can provide to you. \n\n` +
+                    response.join("\n\n"),
+            });
+        } catch (err) {
+            res.json({error: "it failed : " + err });
+        }
     }
     else {
         res.json({'success': false});
