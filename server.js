@@ -18,6 +18,7 @@ app.get('/test', (req, res) => res.status(200).send('ok'));
 //app.get('/api/v1', (req, res) => res.json({'success': true}));
 
 app.post('/api/v1', async (req, res) => {
+    console.log(req.params)
     if(req.params.type === 'esco')
     {
         var myURL = "https://ec.europa.eu/esco/api/resource/occupation?language=en&uri=";
