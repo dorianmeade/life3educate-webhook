@@ -12,6 +12,11 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+app.use(cors ({
+    origin: ["http://localhost:3306"],
+    methods: ["GET", "POST"],
+    credentials: true,
+}));
 
 app.get('/test', (req, res) => res.status(200).send('ok'));
 
