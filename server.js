@@ -19,7 +19,7 @@ app.post('/api/v1', async (req, res) => {
     console.log(req.body)
     if(req.body.type === 'esco')
     {
-        var myURL = "https://ec.europa.eu/esco/api/resource/occupation?language=en&uri=";
+        var myURL = process.env.ESCO_URL;
         
         if (req.body.job == "developer")
         {
@@ -54,16 +54,16 @@ app.post('/api/v1', async (req, res) => {
     }
     else if (req.body.type == 'discovery') {
         const discovery = new DiscoveryV1({
-            version: '2019-04-30',
+            version: process.env.DISCOVERY_VERSION,
             authenticator: new IamAuthenticator({
-                apikey: 'pTWrqgHEIYgMZNi5Wbn0G6Cqa3rQ0eE5KaFLTwbNv--C',
+                apikey: process.env.DISCOVERY_API_KEY,
             }),
-            serviceUrl: 'https://api.us-east.discovery.watson.cloud.ibm.com/instances/ffd0ed75-874f-4502-a65d-613228f0a71a',
+            serviceUrl: process.env.DISCOVERY_URL,
         });
         
-        const queryParams = {
-            'environmentId': '5d9c5d49-b689-49ef-9a37-05343b4c44ff',
-            'collectionId': '4251e13c-9d02-40f6-9d41-9a21d6ca7148',
+        let queryParams = {
+            'environmentId': process.env.DISCOVERY_ENV,
+            'collectionId': process.env.DISCOVERY_COL,
             'naturalLanguageQuery': req.body.job,
             'passages': true,
             'passagesCount': 3,
@@ -72,12 +72,29 @@ app.post('/api/v1', async (req, res) => {
         try {
             data = await discovery.query(queryParams);
             
-            var ids = [];
-            
-            // for(var i = 0; i < data.passages.length; i++) {
-            //    var obj = data.passages.document_id[i];
-            //    ids.push(obj)
-            //}
+            // get passage ids
+            /*var ids = [];
+            for(var i = 0; i < data.result.passages.length; i++) {
+                ids.push(data.result.passages[i].document_id)
+            }
+
+            queryParams = {
+                'environmentId': process.env.DISCOVERY_ENV,
+                'collectionId': process.env.DISCOVERY_COL,
+            };
+            all = await discovery.query(queryParams);
+
+            console.log(ids)
+            // data = data.result.results.filter(id => {
+            //     ids.includes(id.id);
+            // })
+
+            all.result.results.map(id =>{
+                if (id.includes(id.id))
+                    console.log(id.id)
+            })
+            res.json(data)*/
+
             let response = data.result.passages.map((v, i) => {
                 return `${v.document_id}
                         ${v.passage_text}`;
