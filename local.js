@@ -12,11 +12,6 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
-app.use(cors ({
-    origin: ["https://life3.io"],
-    methods: ["GET", "POST"],
-    credentials: true,
-}));
 
 app.get('/test', (req, res) => res.status(200).send('ok'));
 
@@ -119,9 +114,9 @@ app.post('/api/v1', async (req, res) => {
 
         var con = mysql.createConnection({
             host: "localhost",
-            user: "cpses_xoq29fh11g",
-            password: "", 
-            database: 'chatContact'
+            user: "newuser",
+            password: "newpassword", 
+            database: 'userLogin'
         });
 
         con.connect(function(err) {
