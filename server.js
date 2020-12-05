@@ -120,9 +120,10 @@ app.post('/api/v1', async (req, res) => {
         });
 
         con.connect(function(err) {
-            if (err) throw err;
-            console.log("Connected!");
-            res.json({'success': true});
+            if (err) 
+                res.json({'success': false, 'error': err});
+            else
+                res.json({'success': true});
         });
 
         var query = `INSERT INTO emails (address) VALUES ('${req.body.email}')`
