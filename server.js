@@ -119,8 +119,8 @@ app.post('/api/v1', async (req, res) => {
 
         var con = mysql.createConnection({
             host: "localhost",
-            user: "newuser",
-            password: "newpassword", 
+            user: "dorian",
+            password: "sgUHJSUydyT2ruB", 
             database: 'chatContact'
         });
 
