@@ -13,7 +13,7 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(cors ({
-    origin: ["http://localhost:3306"],
+    origin: ["https://life3.io"],
     methods: ["GET", "POST"],
     credentials: true,
 }));
@@ -121,7 +121,7 @@ app.post('/api/v1', async (req, res) => {
             host: "localhost",
             user: "newuser",
             password: "newpassword", 
-            database: 'userLogin'
+            database: 'chatContact'
         });
 
         con.connect(function(err) {
