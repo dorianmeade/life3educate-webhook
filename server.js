@@ -13,7 +13,7 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(cors ({
-    origin: ["https://life3.io"],
+    origin: ["http://localhost:3306"],
     methods: ["GET", "POST"],
     credentials: true,
 }));
@@ -116,27 +116,31 @@ app.post('/api/v1', async (req, res) => {
     }
     else if (req.body.type == 'contact') {
         // save this email to contact page
-
         var con = mysql.createConnection({
-            host: "localhost",
-            user: "cpses_xoq29fh11g",
-            password: "", 
+            host: "107.180.21.51",
+            user: "dorianmeade",
+            password: "sgUHJSUydyT2ruB", 
             database: 'chatContact'
         });
 
-        con.connect(function(err) {
-            if (err) 
-                res.json({'success': false, 'error': err});
-            else
-                res.json({'success': true});
-        });
+        try {
+            con.connect(function(err) {
+                if (err) 
+                    return res.json({'success': false, 'error': err});
+                else
+                    return res.json({'success': true});
+            });
 
-        var query = `INSERT INTO emails (address) VALUES ('${req.body.email}')`
-    
-        con.query(query, function (err, result) {
-            if (err) throw err;
-            console.log("1 record inserted");
-        });
+            var query = `INSERT INTO emails (address) VALUES ('${req.body.email}')`
+        
+            con.query(query, function (err, result) {
+                if (err) throw err;
+                console.log("1 record inserted");
+            });
+        } catch(err) 
+        {
+            console.log(err)
+        }
     
     }
     else {
